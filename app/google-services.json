@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "207190705049",
+    "firebase_url": "https://oldrnd-5d5e6.firebaseio.com",
+    "project_id": "oldrnd-5d5e6",
+    "storage_bucket": "oldrnd-5d5e6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:207190705049:android:f31df661571cd6b17c4908",
+        "android_client_info": {
+          "package_name": "com.example.learningcluster"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "207190705049-d4pcvsjeh0cku7bnkc8s0jeuf0ov4seq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.learningcluster",
+            "certificate_hash": "44a28a73cbaa669cc44bef076faca5a3611cc674"
+          }
+        },
+        {
+          "client_id": "207190705049-7douin0ais358a2rbeioku6v8buqatrc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQo2Uh2WD6njRkOytvEuzEoaNYRGT4m7A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "207190705049-7douin0ais358a2rbeioku6v8buqatrc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
