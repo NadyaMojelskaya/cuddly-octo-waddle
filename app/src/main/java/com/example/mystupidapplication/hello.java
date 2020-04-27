@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,7 +23,5 @@ public class hello extends Activity {
         TextView tv = (TextView)findViewById(R.id.textViewHello);
         CharSequence cs = intent.getStringExtra("textString");//textView устанавливает текст не со string, а с charSequence
         tv.setText(cs);
-
     }
-
 }

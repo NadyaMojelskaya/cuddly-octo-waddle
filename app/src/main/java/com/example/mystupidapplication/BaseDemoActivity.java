@@ -26,7 +26,6 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
-import android.content.Context;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -46,7 +45,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -54,11 +52,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.firestore.Blob;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.maps.android.clustering.ClusterManager;
 
 
 import java.io.ByteArrayOutputStream;
@@ -267,10 +262,7 @@ public abstract class BaseDemoActivity extends FragmentActivity implements OnMap
             Log.e("Exception: %s", e.getMessage());
         }
     }
-
-    /**
-     * Run the demo-specific code.
-     */
+    
     protected abstract void startDemo(boolean isRestore);
 
     protected GoogleMap getMap() {
