@@ -45,6 +45,10 @@
             android:name=".hello"
             android:label="hell">
         </activity>
+        <activity
+            android:name=".image"
+            android:label="im">
+        </activity>
     </application>
 
 </manifest>

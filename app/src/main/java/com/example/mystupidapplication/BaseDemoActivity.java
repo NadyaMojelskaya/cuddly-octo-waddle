@@ -119,7 +119,7 @@ public abstract class BaseDemoActivity extends FragmentActivity implements OnMap
         mIsRestore = savedInstanceState != null;
         setContentView(getLayoutId());
         setUpMap();
-        //addDocumentsToDB();
+
         fixGoogleMapBug();
     }
     @Override
@@ -262,129 +262,14 @@ public abstract class BaseDemoActivity extends FragmentActivity implements OnMap
             Log.e("Exception: %s", e.getMessage());
         }
     }
-    
+
     protected abstract void startDemo(boolean isRestore);
 
     protected GoogleMap getMap() {
         return mMap;
     }
 
-    private void addDocumentsToDB(){
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        Map<String, Object> doc = new HashMap<>();
 
-        GeoPoint pos = new GeoPoint(47.220806, 39.710250);
-        int[] IMAGES = { R.drawable.im1, R.drawable.im2, R.drawable.im3,
-                R.drawable.im4, R.drawable.im5 };
-        byte [] image = convertToByteArray(IMAGES[4]);
-        Blob img= Blob.fromBytes(image);
-        doc.put("position", pos);
-        doc.put("photo", img);
-        doc.put("description", "1954 г.");
-        db.collection("photos2")
-                .add(doc)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d("firestore", "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("firestore", "Error adding document", e);
-                    }
-                });
-
-        doc = new HashMap<>();
-        pos = new GeoPoint(47.220222, 39.707417);
-        image = convertToByteArray(IMAGES[3]);
-        img= Blob.fromBytes(image);
-        doc.put("position", pos);
-        doc.put("photo", img);
-        doc.put("description", "1940 г.");
-        db.collection("photos2")
-                .add(doc)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d("firestore", "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("firestore", "Error adding document", e);
-                    }
-                });
-
-        doc = new HashMap<>();
-        pos = new GeoPoint(47.224306, 39.728056);
-        image = convertToByteArray(IMAGES[2]);
-        img= Blob.fromBytes(image);
-        doc.put("position", pos);
-        doc.put("photo", img);
-        doc.put("description", "1930 г.");
-        db.collection("photos2")
-                .add(doc)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d("firestore", "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("firestore", "Error adding document", e);
-                    }
-                });
-
-        doc = new HashMap<>();
-        pos = new GeoPoint(47.221236, 39.713409);
-        image = convertToByteArray(IMAGES[1]);
-        img= Blob.fromBytes(image);
-        doc.put("position", pos);
-        doc.put("photo", img);
-        doc.put("description", "1920-30 г.");
-        db.collection("photos2")
-                .add(doc)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d("firestore", "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("firestore", "Error adding document", e);
-                    }
-                });
-
-        doc = new HashMap<>();
-        pos = new GeoPoint(47.225667, 39.716917);
-        image = convertToByteArray(IMAGES[0]);
-        img= Blob.fromBytes(image);
-        doc.put("position", pos);
-        doc.put("photo", img);
-        doc.put("description", "1920-30 г.");
-        db.collection("photos2")
-                .add(doc)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d("firestore", "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("firestore", "Error adding document", e);
-                    }
-                });
-
-    }
 
     public byte[] convertToByteArray(int image){
         Resources resources = getResources();
