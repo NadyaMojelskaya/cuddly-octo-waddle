@@ -89,13 +89,6 @@ public abstract class BaseDemoActivity extends FragmentActivity implements OnMap
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
-    // Used for selecting the current place.
-    private static final int M_MAX_ENTRIES = 5;
-    private String[] mLikelyPlaceNames;
-    private String[] mLikelyPlaceAddresses;
-    private List[] mLikelyPlaceAttributions;
-    private LatLng[] mLikelyPlaceLatLngs;
-
     protected int getLayoutId() {
         return R.layout.activity_maps;
     }
@@ -105,6 +98,7 @@ public abstract class BaseDemoActivity extends FragmentActivity implements OnMap
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Construct a FusedLocationProviderClient.
+
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
@@ -167,12 +161,11 @@ public abstract class BaseDemoActivity extends FragmentActivity implements OnMap
 
         // Prompt the user for permission.
         getLocationPermission();
+            // Turn on the My Location layer and the related control on the map.
+            updateLocationUI();
 
-        // Turn on the My Location layer and the related control on the map.
-        updateLocationUI();
-
-        // Get the current location of the device and set the position of the map.
-        getDeviceLocation();
+            // Get the current location of the device and set the position of the map.
+            getDeviceLocation();
 
     }
 
@@ -205,6 +198,8 @@ public abstract class BaseDemoActivity extends FragmentActivity implements OnMap
                     }
                 });
             }
+            else mMap.moveCamera(CameraUpdateFactory
+                    .newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
         }
@@ -212,9 +207,7 @@ public abstract class BaseDemoActivity extends FragmentActivity implements OnMap
 
     private void getLocationPermission() {
         /*
-         * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
-         * onRequestPermissionsResult.
+         * если доступ уже предоставлен, mLocationPermissionGranted = true, а иначе - requestPermissions
          */
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -224,6 +217,7 @@ public abstract class BaseDemoActivity extends FragmentActivity implements OnMap
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            //mLocationPermissionGranted = false;
         }
     }
 
@@ -240,6 +234,7 @@ public abstract class BaseDemoActivity extends FragmentActivity implements OnMap
                     mLocationPermissionGranted = true;
                 }
             }
+
         }
         updateLocationUI();
     }
@@ -256,7 +251,7 @@ public abstract class BaseDemoActivity extends FragmentActivity implements OnMap
                 mMap.setMyLocationEnabled(false);
                 mMap.getUiSettings().setMyLocationButtonEnabled(false);
                 mLastKnownLocation = null;
-                getLocationPermission();
+                //getLocationPermission();
             }
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
@@ -269,19 +264,6 @@ public abstract class BaseDemoActivity extends FragmentActivity implements OnMap
         return mMap;
     }
 
-
-
-    public byte[] convertToByteArray(int image){
-        Resources resources = getResources();
-        Drawable drawable = resources.getDrawable(image);
-        Bitmap bitmap =  ((BitmapDrawable)drawable).getBitmap();
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress( Bitmap.CompressFormat.PNG, 100, stream);
-        byte[] bitmapData = stream.toByteArray();
-
-        return bitmapData;
-
-    }
     private void fixGoogleMapBug() {
         SharedPreferences googleBug = getSharedPreferences("google_bug", Context.MODE_PRIVATE);
         if (!googleBug.contains("fixed")) {

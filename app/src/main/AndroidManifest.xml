@@ -43,11 +43,14 @@
         </activity>
         <activity
             android:name=".hello"
-            android:label="hell">
+            android:label="hell"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".image"
-            android:label="im">
+            android:label="im"
+            >
         </activity>
     </application>
 
