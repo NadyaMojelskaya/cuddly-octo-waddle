@@ -9,13 +9,15 @@ public class Photo2 implements ClusterItem {
     private LatLng position;
     public String description;
     public Bitmap photo;
+    public String eng;
 
     private Photo2(){};
 
-    public Photo2(LatLng position, String description, Bitmap pictureResource) {
+    public Photo2(LatLng position, String description, Bitmap pictureResource, String eng) {
         this.description = description;
         photo = pictureResource;
         this.position = position;
+        this.eng=eng;
     }
 
     @Override
@@ -35,4 +37,5 @@ public class Photo2 implements ClusterItem {
 
     public String getDescription(){ return description; }
     public Bitmap getPhoto() { return photo; }
+    public String getEng(){ return eng; }
 }

@@ -19,14 +19,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.Blob;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
@@ -35,8 +30,6 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
 
 import java.io.ByteArrayOutputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MapsActivity extends BaseDemoActivity
         implements ClusterManager.OnClusterClickListener<Photo2>,
@@ -65,7 +58,7 @@ public class MapsActivity extends BaseDemoActivity
                                 byte[] byteArray = dbPhoto.getPhoto().toBytes();
                                 Bitmap bm = getBitmap(byteArray);
                                 Photo2 photo2 = new Photo2(new LatLng(dbPhoto.getPosition().latitude,
-                                        dbPhoto.getPosition().longitude), dbPhoto.getDescription(), bm);
+                                        dbPhoto.getPosition().longitude), dbPhoto.getDescription(), bm, dbPhoto.getEng());
                                 mClusterManager.addItem(photo2);
                             }
                             listeners();
@@ -105,11 +98,16 @@ public class MapsActivity extends BaseDemoActivity
 
     @Override
     public boolean onClusterItemClick(Photo2 item) {
+
         Intent intent = new Intent(this, hello.class);
         ByteArrayOutputStream bs = new ByteArrayOutputStream();
         item.getPhoto().compress(Bitmap.CompressFormat.JPEG, 100, bs);
         intent.putExtra("byteArray", bs.toByteArray());
-        String desc = item.getDescription();
+        String desc;
+        if(super.lang=="rus")
+            desc = item.getDescription();
+        else
+            desc = item.getEng();
         intent.putExtra("textString", desc);
         startActivity(intent);
         return false;
@@ -122,9 +120,7 @@ public class MapsActivity extends BaseDemoActivity
 
     private class PhotoRenderer extends DefaultClusterRenderer<Photo2> {
         private final IconGenerator mIconGenerator = new IconGenerator(getApplicationContext());
-        //private final IconGenerator mClusterIconGenerator = new IconGenerator(getApplicationContext());
         private final ImageView mImageView;
-        //private final ImageView mClusterImageView;
         private final int mDimension;
 
         public PhotoRenderer() throws InflateException {

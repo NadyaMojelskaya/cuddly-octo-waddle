@@ -15,22 +15,22 @@
  */
 
 package com.example.mystupidapplication;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -46,28 +46,18 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.net.PlacesClient;
-import com.google.firebase.firestore.Blob;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.GeoPoint;
 
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-public abstract class BaseDemoActivity extends FragmentActivity implements OnMapReadyCallback {
+public abstract class BaseDemoActivity extends AppCompatActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
     private boolean mIsRestore;
     private static final String TAG = "kejrg";
     private CameraPosition mCameraPosition;
-
+    public String lang="eng";
     // The entry point to the Places API.
     private PlacesClient mPlacesClient;
 
@@ -98,7 +88,6 @@ public abstract class BaseDemoActivity extends FragmentActivity implements OnMap
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Construct a FusedLocationProviderClient.
-
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
@@ -107,14 +96,28 @@ public abstract class BaseDemoActivity extends FragmentActivity implements OnMap
         }
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
-        // Build the map.
-
         mIsRestore = savedInstanceState != null;
         setContentView(getLayoutId());
         setUpMap();
 
         fixGoogleMapBug();
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        if (item.getItemId()==R.id.rus){
+            Toast.makeText(this, "Установлен русский язык", Toast.LENGTH_SHORT).show();
+            lang="rus";
+        }
+        if (item.getItemId()==R.id.eng){
+            Toast.makeText(this, "English has set", Toast.LENGTH_SHORT).show();
+            lang="eng";
+        }
+        return super.onOptionsItemSelected(item);
     }
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -217,8 +220,7 @@ public abstract class BaseDemoActivity extends FragmentActivity implements OnMap
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-            //mLocationPermissionGranted = false;
-        }
+            }
     }
 
     @Override
@@ -251,7 +253,6 @@ public abstract class BaseDemoActivity extends FragmentActivity implements OnMap
                 mMap.setMyLocationEnabled(false);
                 mMap.getUiSettings().setMyLocationButtonEnabled(false);
                 mLastKnownLocation = null;
-                //getLocationPermission();
             }
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());

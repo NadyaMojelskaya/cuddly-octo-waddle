@@ -33,7 +33,7 @@ public class hello extends Activity {
         TextView tv = new TextView(this);
         tv.setText(cs);
         tv.setTextSize(17);
-        if (cs.length()<30){
+        if (cs.length()<30){//если небольшое описание, расположить его посередине
             tv.setGravity(Gravity.CENTER);
         }
         sv.addView(tv);
