@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.mystupidapplication">
 
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -25,6 +27,7 @@
              sign the APK for publishing.
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
+        <receiver android:name=".GeofenceBroadcastReceiver"/>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBhs8GgaDqZ6BnCjXKyploqc6u1GyuFwIQ" />
@@ -37,21 +40,18 @@
             android:label="@string/title_activity_maps">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".hello"
-            android:label="hell"
             android:configChanges="orientation"
-            android:screenOrientation="portrait">
-        </activity>
+            android:label="hell"
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".image"
-            android:label="im"
-            >
-        </activity>
+            android:label="im"></activity>
+        <service android:name=".LocationService"/>
     </application>
 
 </manifest>

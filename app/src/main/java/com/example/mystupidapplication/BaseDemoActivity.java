@@ -15,10 +15,12 @@
  */
 
 package com.example.mystupidapplication;
+import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -27,13 +29,11 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -47,33 +47,25 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.libraries.places.api.net.PlacesClient;
 
 
 import java.io.File;
 
 public abstract class BaseDemoActivity extends AppCompatActivity implements OnMapReadyCallback {
-    private GoogleMap mMap;
+    public GoogleMap mMap;
     private boolean mIsRestore;
     private static final String TAG = "kejrg";
     private CameraPosition mCameraPosition;
     public String lang="eng";
-    // The entry point to the Places API.
-    private PlacesClient mPlacesClient;
-
-    // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
-
-    // A default location (Sydney, Australia) and default zoom to use when location permission is
-    // not granted.
     private final LatLng mDefaultLocation = new LatLng(47.225667, 39.716917);
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private boolean mLocationPermissionGranted;
+    public boolean mLocationPermissionGranted;
 
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
-    private Location mLastKnownLocation;
+    public Location mLastKnownLocation;
 
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
@@ -114,7 +106,7 @@ public abstract class BaseDemoActivity extends AppCompatActivity implements OnMa
             lang="rus";
         }
         if (item.getItemId()==R.id.eng){
-            Toast.makeText(this, "English has set", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "English set", Toast.LENGTH_SHORT).show();
             lang="eng";
         }
         return super.onOptionsItemSelected(item);
@@ -137,7 +129,9 @@ public abstract class BaseDemoActivity extends AppCompatActivity implements OnMa
         map.setMapStyle(
                 MapStyleOptions.loadRawResourceStyle(
                         this, R.raw.style_json));
-        startDemo(mIsRestore);
+
+
+
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
 
             @Override
@@ -145,6 +139,7 @@ public abstract class BaseDemoActivity extends AppCompatActivity implements OnMa
             public View getInfoWindow(Marker arg0) {
                 return null;
             }
+
 
             @Override
             public View getInfoContents(Marker marker) {
@@ -158,25 +153,27 @@ public abstract class BaseDemoActivity extends AppCompatActivity implements OnMa
                 TextView snippet = infoWindow.findViewById(R.id.snippet);
                 snippet.setText(marker.getSnippet());
 
+
                 return infoWindow;
             }
         });
 
+
+
         // Prompt the user for permission.
         getLocationPermission();
-            // Turn on the My Location layer and the related control on the map.
-            updateLocationUI();
+        // Turn on the My Location layer and the related control on the map.
+        updateLocationUI();
 
-            // Get the current location of the device and set the position of the map.
-            getDeviceLocation();
-
+        // Get the current location of the device and set the position of the map.
+        getDeviceLocation();
+        startDemo(mIsRestore);
     }
-
+    /*
+     * Get the best and most recent location of the device, which may be null in rare
+     * cases when a location is not available.
+     */
     private void getDeviceLocation() {
-        /*
-         * Get the best and most recent location of the device, which may be null in rare
-         * cases when a location is not available.
-         */
         try {
             if (mLocationPermissionGranted) {
                 Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
@@ -212,7 +209,20 @@ public abstract class BaseDemoActivity extends AppCompatActivity implements OnMa
         /*
          * если доступ уже предоставлен, mLocationPermissionGranted = true, а иначе - requestPermissions
          */
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
+        if (Build.VERSION.SDK_INT >= 29) {
+            //We need background permission
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                Log.e("ACCESS_BACKGROUND_LOC", "PERMISSION_GRANTED");
+            } else {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+                    //We show a dialog and ask for permission
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 10002);
+                } else {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 10002);
+                }
+            }
+        }
+            if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
@@ -237,6 +247,15 @@ public abstract class BaseDemoActivity extends AppCompatActivity implements OnMa
                 }
             }
 
+        }
+        if (requestCode == 10002) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //We have the permission
+                Toast.makeText(this, "You can add geofences...", Toast.LENGTH_SHORT).show();
+            } else {
+                //We do not have the permission..
+                Toast.makeText(this, "Background location access is neccessary for geofences to trigger...", Toast.LENGTH_SHORT).show();
+            }
         }
         updateLocationUI();
     }

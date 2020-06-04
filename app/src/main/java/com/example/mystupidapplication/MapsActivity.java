@@ -1,17 +1,19 @@
 package com.example.mystupidapplication;
-
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.InflateException;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
+import java.util.Random;
 import androidx.annotation.NonNull;
-
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -19,6 +21,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -36,9 +40,13 @@ public class MapsActivity extends BaseDemoActivity
         ClusterManager.OnClusterItemClickListener<Photo2>, OnMapReadyCallback {
     private ClusterManager<Photo2> mClusterManager;
     private Context context;
-
+    private GeofencingClient geofencingClient;
+    private GeofenceHelper geofenceHelper;
+    private float GEOFENCE_RADIUS = 20;
     @Override
     protected void startDemo(boolean isRestore) {
+        geofencingClient = LocationServices.getGeofencingClient(this);
+        geofenceHelper = new GeofenceHelper(this);
         context = getApplicationContext();
         if (!isRestore) {
             getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(47.220222, 39.707417), 13));
@@ -47,6 +55,7 @@ public class MapsActivity extends BaseDemoActivity
         db.collection("photos2")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
@@ -60,19 +69,19 @@ public class MapsActivity extends BaseDemoActivity
                                 Photo2 photo2 = new Photo2(new LatLng(dbPhoto.getPosition().latitude,
                                         dbPhoto.getPosition().longitude), dbPhoto.getDescription(), bm, dbPhoto.getEng());
                                 mClusterManager.addItem(photo2);
-                            }
+
+                                addGeofence(photo2.getPosition(), GEOFENCE_RADIUS);
+                        }
                             listeners();
+
                             mClusterManager.cluster();
                         }
                     }
                 });
-
     }
 
     public void listeners() {
         getMap().setOnCameraIdleListener(mClusterManager);
-        getMap().setOnMarkerClickListener(mClusterManager);
-        getMap().setOnInfoWindowClickListener(mClusterManager);
         mClusterManager.setOnClusterClickListener(this);
         mClusterManager.setOnClusterItemClickListener(this);
     }
@@ -98,7 +107,7 @@ public class MapsActivity extends BaseDemoActivity
 
     @Override
     public boolean onClusterItemClick(Photo2 item) {
-
+        //передача данных в активность hello
         Intent intent = new Intent(this, hello.class);
         ByteArrayOutputStream bs = new ByteArrayOutputStream();
         item.getPhoto().compress(Bitmap.CompressFormat.JPEG, 100, bs);
@@ -126,7 +135,6 @@ public class MapsActivity extends BaseDemoActivity
         public PhotoRenderer() throws InflateException {
             super(getApplicationContext(), getMap(), mClusterManager);
             try {
-                View multiProfile = getLayoutInflater().inflate(R.layout.multi_profile, null);
                 mImageView = new ImageView(getApplicationContext());
                 mDimension = (int) getResources().getDimension(R.dimen.custom_profile_image);
                 mImageView.setLayoutParams(new ViewGroup.LayoutParams(mDimension, mDimension));
@@ -137,17 +145,39 @@ public class MapsActivity extends BaseDemoActivity
                 Log.e("INFLATER", "onCreateView", e);
                 throw e;
             }
-
         }
 
         @Override
         protected void onBeforeClusterItemRendered(Photo2 Photo, MarkerOptions markerOptions) {
-            // Draw a single Photo.
-            // Set the info window to show their name.
             mImageView.setImageBitmap(Photo.getPhoto());
             Bitmap icon = mIconGenerator.makeIcon();
             markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon));
         }
+    }
+
+    private void addGeofence(LatLng latLng, float radius) {
+        //у каждого Geofence должен быть уникальный id
+        Random r = new Random();
+        char c = (char)(r.nextInt(26) + 'a');
+        String GEOFENCE_ID = "id_"+c;
+        Geofence geofence = geofenceHelper.getGeofence(GEOFENCE_ID, latLng, radius, Geofence.GEOFENCE_TRANSITION_ENTER);
+        GeofencingRequest geofencingRequest = geofenceHelper.getGeofencingRequest(geofence);
+        PendingIntent pendingIntent = geofenceHelper.getPendingIntent();
+        geofencingClient.addGeofences(geofencingRequest, pendingIntent)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("addGeofence", "onSuccess: Geofence Added...");
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        String errorMessage = geofenceHelper.getErrorString(e);
+                        Log.d("addGeofence", "onFailure: " + errorMessage);
+                    }
+                });
     }
 
 }
