@@ -2,4 +2,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/rus" android:title="Русский язык"></item>
     <item android:id="@+id/eng" android:title="English language"></item>
+    <item android:id="@+id/filter" android:title="Фильтр"></item>
 </menu>

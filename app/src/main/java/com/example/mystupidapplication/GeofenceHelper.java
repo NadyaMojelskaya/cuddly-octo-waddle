@@ -4,11 +4,18 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofenceStatusCodes;
+import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.QuerySnapshot;
 
 public class GeofenceHelper extends ContextWrapper {
     public long durationMillis = 1000*60;
@@ -25,6 +32,12 @@ public class GeofenceHelper extends ContextWrapper {
                 .build();
     }
 
+//    public void remove (GeofencingClient geofencingClient){
+//        geofencingClient.removeGeofences(pendingIntent,
+//                new OnRemoveGeofencesResultListener() {;
+//
+//
+//    }
     public Geofence getGeofence(String ID, LatLng latLng, float radius, int transitionTypes) {
         return new Geofence.Builder()
                 .setCircularRegion(latLng.latitude, latLng.longitude, radius)

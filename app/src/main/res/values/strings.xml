@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Достопримечательности Ростова-на-Дону</string>
     <string name="title_activity_maps">Карта фотографий</string>
-    <string name="hfkhf">hfkhf</string>
-    <string name="textview">TextView</string>
+
+
 
     <string name="new_message_notification_title_template">New message: %1$s</string>
 
@@ -18,4 +18,32 @@
 
     <string name="action_share">Share</string>
     <string name="action_reply">Reply</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="_1900">1900-е</string>
+    <string name="_1910">1910-е</string>
+    <string name="_1920">1920-е</string>
+    <string name="_1930">1930-е</string>
+    <string name="_1940">1940-е</string>
+    <string name="_1950">1950-е</string>
+    <string name="show">Показать</string>
+    <string name="textview">TextView</string>
+    <string name="_1960">1960-е</string>
+    <string name="_1970">1970-е</string>
+    <string name="_1980">1980-е</string>
+    <string name="_1990">1990-е</string>
 </resources>

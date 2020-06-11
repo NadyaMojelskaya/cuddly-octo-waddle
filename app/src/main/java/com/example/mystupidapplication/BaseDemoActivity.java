@@ -17,6 +17,7 @@
 package com.example.mystupidapplication;
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -108,6 +109,10 @@ public abstract class BaseDemoActivity extends AppCompatActivity implements OnMa
         if (item.getItemId()==R.id.eng){
             Toast.makeText(this, "English set", Toast.LENGTH_SHORT).show();
             lang="eng";
+        }
+        if (item.getItemId()==R.id.filter){
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }

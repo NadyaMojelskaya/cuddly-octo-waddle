@@ -8,6 +8,9 @@ import android.util.Log;
 import android.view.InflateException;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import androidx.annotation.NonNull;
 import com.google.android.gms.location.Geofence;
@@ -24,8 +27,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
@@ -52,34 +58,75 @@ public class MapsActivity extends BaseDemoActivity
             getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(47.220222, 39.707417), 13));
         }
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("photos2")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        // Create a reference to the cities collection
+        if(getIntent().getBooleanArrayExtra("Array")!=null){Log.d("getIntent()",   "!=null");
+            query();}
+        else {
+            Log.d("getIntent()",   "is null");
+            db.collection("photos2")
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
 
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            mClusterManager = new ClusterManager<>(context, getMap());
-                            mClusterManager.setRenderer(new PhotoRenderer());
-                            getMap().setOnCameraIdleListener(mClusterManager);
-                            for (DocumentSnapshot document : task.getResult()) {
-                                Photo dbPhoto = document.toObject(Photo.class);
-                                byte[] byteArray = dbPhoto.getPhoto().toBytes();
-                                Bitmap bm = getBitmap(byteArray);
-                                Photo2 photo2 = new Photo2(new LatLng(dbPhoto.getPosition().latitude,
-                                        dbPhoto.getPosition().longitude), dbPhoto.getDescription(), bm, dbPhoto.getEng());
-                                mClusterManager.addItem(photo2);
-
-                                addGeofence(photo2.getPosition(), GEOFENCE_RADIUS);
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                mClusterManager = new ClusterManager<>(context, getMap());
+                                mClusterManager.setRenderer(new PhotoRenderer());
+                                getMap().setOnCameraIdleListener(mClusterManager);
+                                for (DocumentSnapshot document : task.getResult()) {
+                                    Photo dbPhoto = document.toObject(Photo.class);
+                                    byte[] byteArray = dbPhoto.getPhoto().toBytes();
+                                    Bitmap bm = getBitmap(byteArray);
+                                    Photo2 photo2 = new Photo2(new LatLng(dbPhoto.getPosition().latitude,
+                                            dbPhoto.getPosition().longitude), dbPhoto.getDescription(), bm, dbPhoto.getEng(), dbPhoto.getPeriod());
+                                    mClusterManager.addItem(photo2);
+                                    addGeofence(photo2.getPosition(), GEOFENCE_RADIUS);
+                                }
+                                listeners();
+                                mClusterManager.cluster();
+                            }
                         }
-                            listeners();
-
-                            mClusterManager.cluster();
+                    });
+        }
+    }
+public void query(){
+    Intent intent = getIntent();
+    boolean[] array = intent.getBooleanArrayExtra("Array");
+    mClusterManager = new ClusterManager<>(context, getMap());
+    mClusterManager.setRenderer(new PhotoRenderer());
+    getMap().setOnCameraIdleListener(mClusterManager);
+    //geofenceHelper.remove(geofencingClient);
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    CollectionReference citiesRef = db.collection("photos2");
+    // Create a query against the collection.
+    for (int i=0; i<10; i++){
+        if (array[i]==true){
+            Query query1 = citiesRef.whereEqualTo("period", i);
+            query1.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if(task.isSuccessful()){
+                        for(QueryDocumentSnapshot documentSnapshot:task.getResult()){
+                            Photo dbPhoto = documentSnapshot.toObject(Photo.class);
+                            byte[] byteArray = dbPhoto.getPhoto().toBytes();
+                            Bitmap bm = getBitmap(byteArray);
+                            Photo2 photo2 = new Photo2(new LatLng(dbPhoto.getPosition().latitude,
+                                    dbPhoto.getPosition().longitude), dbPhoto.getDescription(),
+                                    bm, dbPhoto.getEng(), dbPhoto.getPeriod());
+                            mClusterManager.addItem(photo2);
                         }
+                        listeners();
+                        mClusterManager.cluster();
                     }
-                });
+                    else{
+                        Log.d("QUERY1", "everything's bad");
+                    }
+                }
+            });
+        }
     }
 
+}
     public void listeners() {
         getMap().setOnCameraIdleListener(mClusterManager);
         mClusterManager.setOnClusterClickListener(this);
